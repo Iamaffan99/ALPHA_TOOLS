@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ALPHA_TOOLS — free, fast browser-based utilities.">
+<meta name="theme-color" content="#07090d">
+<title>ALPHA_TOOLS — Free Online Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<img src="logo.jpg" alt="">
+</head>
+<body>
+<div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+
+<header class="header">
+  <div class="container nav">
+    <!-- <a href="#home" class="logo"><span class="logo-mark">A</span><span>ALPHA<span class="logo-accent">_TOOLS</span></span></a> -->
+    <a href="#home" class="logo">
+  
+  <span>ALPHA<span class="logo-accent">_TOOLS</span></span>
+</a>
+    <nav class="desktop-nav">
+      <a href="#home">Home</a><a href="#tools">Tools</a><a href="#categories">Categories</a><a href="#about">About</a><a href="#contact">Contact</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#home">Home</a><a href="#tools">Tools</a><a href="#categories">Categories</a><a href="#about">About</a><a href="#contact">Contact</a>
+  </div>
+</header>
+
+<main id="home">
+<section class="hero">
+  <div class="hero-photo"></div><div class="hero-overlay"></div>
+  <div class="hero-grid"></div><div class="hero-glow"></div>
+  <div class="container hero-content">
+    <div class="hero-copy">
+      <div class="badge"><span class="status-dot"></span>Browser tools • Fast • No sign-up</div>
+      <p class="hero-kicker">UTILITY LAB / 2026</p>
+      <h1>Powerful tools.<br><span>Made simple.</span></h1>
+      <p class="hero-description">Compress, convert, generate, format and manage your files directly in your browser. Your files stay on your device for the browser-based tools.</p>
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="toolSearch" placeholder="Search for a tool..." autocomplete="off">
+        <span class="search-shortcut">Ctrl K</span>
+      </div>
+      <div class="quick-links"><span>Popular:</span>
+        <button data-search="Image Compressor">Image Compressor</button>
+        <button data-search="QR Generator">QR Generator</button>
+        <button data-search="JSON Formatter">JSON Formatter</button>
+        <button data-search="PDF Merger">PDF Merger</button>
+      </div>
+    </div>
+    <div class="hero-side-card">
+      <span>ALPHA / TOOLKIT</span>
+      <strong>Everything useful,<br>in one clean place.</strong>
+      <small>Local-first utilities with a minimal interface.</small>
+    </div>
+  </div>
+  <a class="scroll-cue" href="#tools">SCROLL <span>↓</span></a>
+</section>
+
+<section class="stats-section">
+  <div class="container stats">
+    <div class="stat"><strong>18+</strong><span>Working Tools</span></div>
+    <div class="stat"><strong>100%</strong><span>Free to Use</span></div>
+    <div class="stat"><strong>0</strong><span>Sign-ups Required</span></div>
+    <div class="stat"><strong>24/7</strong><span>Browser Access</span></div>
+  </div>
+</section>
+
+<section class="tools-section" id="tools">
+<div class="container">
+  <div class="section-heading">
+    <div><span class="section-label">EXPLORE / TOOLKIT</span><h2>All your tools. <span>One place.</span></h2></div>
+    <p>Click any tool to open a real working utility. Most processing happens locally in your browser.</p>
+  </div>
+  <div class="filter-bar" id="categories">
+    <button class="filter-btn active" data-category="all">All Tools</button>
+    <button class="filter-btn" data-category="image">🖼 Image</button>
+    <button class="filter-btn" data-category="pdf">📄 PDF</button>
+    <button class="filter-btn" data-category="text">Aa Text</button>
+    <button class="filter-btn" data-category="developer">&lt;/&gt; Developer</button>
+    <button class="filter-btn" data-category="utility">⚡ Utility</button>
+    <button class="filter-btn" data-category="color">🎨 Color</button>
+  </div>
+  <div class="tools-grid" id="toolsGrid">
+
+    <article class="tool-card" data-category="image" data-name="image compressor" data-tool="image-compressor"><div class="tool-icon image-icon">▧</div><div class="tool-content"><span class="tool-category">IMAGE</span><h3>Image Compressor</h3><p>Reduce image size with adjustable quality.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="image" data-name="image resizer" data-tool="image-resizer"><div class="tool-icon image-icon">↗</div><div class="tool-content"><span class="tool-category">IMAGE</span><h3>Image Resizer</h3><p>Resize an image to exact dimensions.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="image" data-name="image converter" data-tool="image-converter"><div class="tool-icon image-icon">◈</div><div class="tool-content"><span class="tool-category">IMAGE</span><h3>Image Converter</h3><p>Convert images to PNG, JPEG or WebP.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+
+    <article class="tool-card" data-category="pdf" data-name="pdf merger" data-tool="pdf-merger"><div class="tool-icon pdf-icon">PDF</div><div class="tool-content"><span class="tool-category">PDF</span><h3>PDF Merger</h3><p>Combine multiple PDFs into one file.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="pdf" data-name="pdf splitter" data-tool="pdf-splitter"><div class="tool-icon pdf-icon">✂</div><div class="tool-content"><span class="tool-category">PDF</span><h3>PDF Splitter</h3><p>Extract selected PDF pages.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="pdf" data-name="pdf compressor" data-tool="pdf-compressor"><div class="tool-icon pdf-icon">↓</div><div class="tool-content"><span class="tool-category">PDF</span><h3>PDF Compressor</h3><p>Re-save PDFs with browser-side optimization.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+
+    <article class="tool-card" data-category="text" data-name="word counter" data-tool="word-counter"><div class="tool-icon text-icon">Aa</div><div class="tool-content"><span class="tool-category">TEXT</span><h3>Word Counter</h3><p>Count words, characters, lines and sentences.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="text" data-name="case converter" data-tool="case-converter"><div class="tool-icon text-icon">Aa</div><div class="tool-content"><span class="tool-category">TEXT</span><h3>Case Converter</h3><p>Uppercase, lowercase, title and sentence case.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+
+    <article class="tool-card" data-category="developer" data-name="json formatter" data-tool="json-formatter"><div class="tool-icon dev-icon">{ }</div><div class="tool-content"><span class="tool-category">DEVELOPER</span><h3>JSON Formatter</h3><p>Format, validate and minify JSON.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="developer" data-name="base64 encoder decoder" data-tool="base64"><div class="tool-icon dev-icon">64</div><div class="tool-content"><span class="tool-category">DEVELOPER</span><h3>Base64 Encoder</h3><p>Encode or decode UTF-8 Base64 text.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="developer" data-name="url encoder decoder" data-tool="url-encoder"><div class="tool-icon dev-icon">↗</div><div class="tool-content"><span class="tool-category">DEVELOPER</span><h3>URL Encoder</h3><p>Encode or decode URL components.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="developer" data-name="uuid generator" data-tool="uuid"><div class="tool-icon dev-icon">ID</div><div class="tool-content"><span class="tool-category">DEVELOPER</span><h3>UUID Generator</h3><p>Generate cryptographically strong UUIDs.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+
+    <article class="tool-card" data-category="utility" data-name="password generator" data-tool="password-generator"><div class="tool-icon utility-icon">⌁</div><div class="tool-content"><span class="tool-category">UTILITY</span><h3>Password Generator</h3><p>Generate strong random passwords locally.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="utility" data-name="qr generator" data-tool="qr-generator"><div class="tool-icon utility-icon">▦</div><div class="tool-content"><span class="tool-category">UTILITY</span><h3>QR Generator</h3><p>Create a downloadable QR code.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="utility" data-name="timestamp converter" data-tool="timestamp"><div class="tool-icon utility-icon">⌚</div><div class="tool-content"><span class="tool-category">UTILITY</span><h3>Timestamp Converter</h3><p>Convert dates and Unix timestamps.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+
+    <article class="tool-card" data-category="color" data-name="color converter" data-tool="color-converter"><div class="tool-icon color-icon">◉</div><div class="tool-content"><span class="tool-category">COLOR</span><h3>Color Converter</h3><p>Convert HEX, RGB and HSL values.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+    <article class="tool-card" data-category="color" data-name="color palette generator" data-tool="palette"><div class="tool-icon color-icon">◐</div><div class="tool-content"><span class="tool-category">COLOR</span><h3>Palette Generator</h3><p>Generate a five-color palette from a base color.</p><button class="tool-link">Open tool <span>→</span></button></div></article>
+  </div>
+  <div class="no-results" id="noResults"><div>⌕</div><h3>No tools found</h3><p>Try another search or category.</p></div>
+</div>
+</section>
+
+<section class="about" id="about">
+  <div class="container about-box">
+    <div class="about-copy"><span class="section-label">ABOUT ALPHA_TOOLS</span><h2>Small tools. <span>Big productivity.</span></h2><p>ALPHA_TOOLS is a clean collection of practical browser utilities. The interface is designed to be quick, distraction-free and easy to use on desktop and mobile.</p></div>
+    <div class="about-points"><div><b>01</b><span>Simple UI</span></div><div><b>02</b><span>Local processing</span></div><div><b>03</b><span>No account needed</span></div></div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="container contact-box">
+    <div><span class="section-label">CONTACT / CONNECT</span><h2>Let's build something <span>useful.</span></h2><p>For feedback, collaborations or project enquiries, connect through any of the links below.</p></div>
+    <div class="contact-links">
+      <a href="mailto:shaikhaffan0658@gmail.com" class="contact-card"><span class="contact-icon">@</span><span><small>EMAIL</small><strong>shaikhaffan0658@gmail.com</strong></span><b>↗</b></a>
+      <a href="https://www.instagram.com/_affanpnj" target="_blank" rel="noopener noreferrer" class="contact-card"><span class="contact-icon">◎</span><span><small>INSTAGRAM</small><strong>@_affanpnj</strong></span><b>↗</b></a>
+      <a href="https://x.com/IMAFFAN_01" target="_blank" rel="noopener noreferrer" class="contact-card"><span class="contact-icon">𝕏</span><span><small>X / TWITTER</small><strong>@IMAFFAN_01</strong></span><b>↗</b></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer"><div class="container footer-inner"><div class="logo"><span class="logo-mark">A</span><span>ALPHA<span class="logo-accent">_TOOLS</span></span></div><p>© 2026 ALPHA_TOOLS. Built for everyone.</p><a href="#home">Back to top ↑</a></div></footer>
+
+<div class="modal" id="toolModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="tool-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><div><span class="section-label" id="modalCategory">TOOL</span><h2 id="modalTitle">Tool</h2></div><button class="close-btn" id="closeModal" aria-label="Close">×</button></div>
+    <div id="toolBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

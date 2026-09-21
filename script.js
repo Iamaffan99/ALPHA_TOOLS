@@ -1,0 +1,92 @@
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const searchInput = $("#toolSearch"), cards = $$(".tool-card"), filterButtons = $$(".filter-btn");
+const noResults = $("#noResults"), modal = $("#toolModal"), body = $("#toolBody"), modalTitle = $("#modalTitle"), modalCategory = $("#modalCategory"), toast = $("#toast");
+let activeCategory = "all";
+
+function toastMsg(msg){toast.textContent=msg;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2200)}
+function filterTools(){
+  const q=searchInput.value.trim().toLowerCase(); let visible=0;
+  cards.forEach(c=>{const ok=(!q||c.dataset.name.includes(q))&&(activeCategory==="all"||c.dataset.category===activeCategory);c.classList.toggle("hidden",!ok);if(ok)visible++});
+  noResults.style.display=visible?"none":"block";
+}
+searchInput.addEventListener("input",filterTools);
+filterButtons.forEach(b=>b.addEventListener("click",()=>{filterButtons.forEach(x=>x.classList.remove("active"));b.classList.add("active");activeCategory=b.dataset.category;filterTools()}));
+$$(".quick-links button").forEach(b=>b.addEventListener("click",()=>{searchInput.value=b.dataset.search;activeCategory="all";filterButtons.forEach(x=>x.classList.toggle("active",x.dataset.category==="all"));$("#tools").scrollIntoView({behavior:"smooth"});filterTools()}));
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();searchInput.focus()}if(e.key==="Escape"){if(modal.classList.contains("open"))closeModal();else{searchInput.value="";filterTools();searchInput.blur()}}});
+$("#menuBtn").addEventListener("click",()=>$("#mobileNav").classList.toggle("open"));
+$$(".mobile-nav a").forEach(a=>a.addEventListener("click",()=>$("#mobileNav").classList.remove("open")));
+
+function closeModal(){modal.classList.remove("open");modal.setAttribute("aria-hidden","true");body.innerHTML=""}
+$("#closeModal").addEventListener("click",closeModal);$(".modal-backdrop").addEventListener("click",closeModal);
+
+const titles={
+"image-compressor":["Image Compressor","IMAGE"],"image-resizer":["Image Resizer","IMAGE"],"image-converter":["Image Converter","IMAGE"],
+"pdf-merger":["PDF Merger","PDF"],"pdf-splitter":["PDF Splitter","PDF"],"pdf-compressor":["PDF Compressor","PDF"],
+"word-counter":["Word Counter","TEXT"],"case-converter":["Case Converter","TEXT"],"json-formatter":["JSON Formatter","DEVELOPER"],"base64":["Base64 Encoder","DEVELOPER"],"url-encoder":["URL Encoder / Decoder","DEVELOPER"],"uuid":["UUID Generator","DEVELOPER"],
+"password-generator":["Password Generator","UTILITY"],"qr-generator":["QR Generator","UTILITY"],"timestamp":["Timestamp Converter","UTILITY"],"color-converter":["Color Converter","COLOR"],"palette":["Palette Generator","COLOR"]
+};
+$$(".tool-link").forEach(b=>b.addEventListener("click",()=>openTool(b.closest(".tool-card").dataset.tool)));
+function openTool(key){const [t,c]=titles[key];modalTitle.textContent=t;modalCategory.textContent=c;modal.classList.add("open");modal.setAttribute("aria-hidden","false");renderTool(key);$(".tool-modal").scrollTop=0}
+
+function renderTool(key){
+  const U = {
+    "image-compressor": imageCompressor, "image-resizer": imageResizer, "image-converter": imageConverter,
+    "pdf-merger": pdfMerger, "pdf-splitter": pdfSplitter, "pdf-compressor": pdfCompressor,
+    "word-counter": wordCounter, "case-converter": caseConverter, "json-formatter": jsonFormatter, "base64": base64Tool,
+    "url-encoder": urlTool, "uuid": uuidTool, "password-generator": passwordTool, "qr-generator": qrTool,
+    "timestamp": timestampTool, "color-converter": colorTool, "palette": paletteTool
+  }; U[key]();
+}
+function setBody(html){body.innerHTML=`<div class="tool-ui">${html}</div>`}
+function filePicker(multiple=false, accept="*"){return `<label class="dropzone">Drop file here or click to choose<input id="toolFile" class="file-input" type="file" ${multiple?"multiple":""} accept="${accept}"></label>`}
+function downloadBlob(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function downloadData(url,name){const a=document.createElement("a");a.href=url;a.download=name;a.click()}
+
+function loadImage(file){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=URL.createObjectURL(file)})}
+function canvasBlob(canvas,type,q){return new Promise(r=>canvas.toBlob(r,type,q))}
+
+function imageCompressor(){
+ setBody(`${filePicker(false,"image/*")}<div class="row"><label>Quality <span id="qualityVal" class="range-val">0.75</span><input id="quality" type="range" min=".1" max="1" step=".05" value=".75"></label><button id="run" class="action">Compress & Download</button></div><div id="result" class="result">Choose an image.</div>`);
+ $("#quality").oninput=()=>$("#qualityVal").textContent=$("#quality").value;
+ $("#run").onclick=async()=>{const f=$("#toolFile").files[0];if(!f)return toastMsg("Choose an image first.");const im=await loadImage(f),c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);const blob=await canvasBlob(c,"image/jpeg",+$("#quality").value);$("#result").textContent=`Original: ${(f.size/1024).toFixed(1)} KB → Output: ${(blob.size/1024).toFixed(1)} KB`;downloadBlob(blob,"compressed-"+f.name.replace(/\.[^.]+$/,"")+".jpg")};
+}
+function imageResizer(){
+ setBody(`${filePicker(false,"image/*")}<div class="row"><label>Width (px)<input id="w" type="number" min="1" placeholder="1200"></label><label>Height (px)<input id="h" type="number" min="1" placeholder="800"></label><label>Format<select id="fmt"><option value="image/png">PNG</option><option value="image/jpeg">JPEG</option><option value="image/webp">WebP</option></select></label></div><button id="run" class="action">Resize & Download</button><div id="result" class="result">Choose an image.</div>`);
+ $("#run").onclick=async()=>{const f=$("#toolFile").files[0];if(!f)return toastMsg("Choose an image.");const im=await loadImage(f),w=+$("#w").value||im.naturalWidth,h=+$("#h").value||im.naturalHeight,c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);const b=await canvasBlob(c,$("#fmt").value,.9);downloadBlob(b,"resized-"+f.name.replace(/\.[^.]+$/,"")+"."+$("#fmt").value.split("/")[1]);$("#result").textContent=`Done — ${w} × ${h}px`};
+}
+function imageConverter(){
+ setBody(`${filePicker(false,"image/*")}<label>Convert to<select id="fmt"><option value="image/png">PNG</option><option value="image/jpeg">JPEG</option><option value="image/webp">WebP</option></select></label><button id="run" class="action">Convert & Download</button><div id="result" class="result">Browser canvas supports PNG, JPEG and WebP output.</div>`);
+ $("#run").onclick=async()=>{const f=$("#toolFile").files[0];if(!f)return toastMsg("Choose an image.");const im=await loadImage(f),c=document.createElement("canvas");c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext("2d").drawImage(im,0,0);const type=$("#fmt").value,b=await canvasBlob(c,type,.92);downloadBlob(b,"converted."+type.split("/")[1]);$("#result").textContent="Conversion complete."};
+}
+
+async function pdfBytes(file){return new Uint8Array(await file.arrayBuffer())}
+function pdfMerger(){
+ setBody(`${filePicker(true,"application/pdf")}<div class="file-list" id="list">Select 2 or more PDFs.</div><button id="run" class="action">Merge PDFs & Download</button><div id="result" class="result"></div>`);
+ $("#toolFile").onchange=()=>$("#list").textContent=[...$("#toolFile").files].map(f=>f.name).join(" • ");
+ $("#run").onclick=async()=>{const fs=[...$("#toolFile").files];if(fs.length<2)return toastMsg("Choose at least 2 PDFs.");try{const out=await PDFLib.PDFDocument.create();for(const f of fs){const src=await PDFLib.PDFDocument.load(await pdfBytes(f));const pages=await out.copyPages(src,src.getPageIndices());pages.forEach(p=>out.addPage(p))}const b=await out.save({useObjectStreams:true});downloadBlob(new Blob([b],{type:"application/pdf"}),"merged.pdf");$("#result").textContent=`Merged ${fs.length} PDFs successfully.`}catch(e){$("#result").textContent="Could not merge this PDF. It may be encrypted or unsupported."}};
+}
+function pdfSplitter(){
+ setBody(`${filePicker(false,"application/pdf")}<label>Pages to extract (example: 1,3-5)<input id="pages" type="text" placeholder="1,3-5"></label><button id="run" class="action">Split & Download</button><div id="result" class="result"></div>`);
+ $("#run").onclick=async()=>{const f=$("#toolFile").files[0];if(!f)return toastMsg("Choose a PDF.");try{const src=await PDFLib.PDFDocument.load(await pdfBytes(f));const nums=parsePages($("#pages").value,src.getPageCount());if(!nums.length)return toastMsg("Enter valid page numbers.");const out=await PDFLib.PDFDocument.create();const pages=await out.copyPages(src,nums.map(n=>n-1));pages.forEach(p=>out.addPage(p));const b=await out.save({useObjectStreams:true});downloadBlob(new Blob([b],{type:"application/pdf"}),"split-pages.pdf");$("#result").textContent=`Created PDF with ${nums.length} page(s).`}catch(e){$("#result").textContent="Could not process this PDF."}};
+}
+function parsePages(s,max){const set=new Set();s.split(",").map(x=>x.trim()).filter(Boolean).forEach(x=>{if(x.includes("-")){let[a,b]=x.split("-").map(Number);if(Number.isFinite(a)&&Number.isFinite(b)){if(a>b)[a,b]=[b,a];for(let n=a;n<=b;n++)if(n>=1&&n<=max)set.add(n)}}else{const n=Number(x);if(n>=1&&n<=max)set.add(n)}});return [...set].sort((a,b)=>a-b)}
+function pdfCompressor(){
+ setBody(`${filePicker(false,"application/pdf")}<div class="tool-note">This browser-side compressor re-saves the PDF with object streams. Actual size reduction depends on the source PDF.</div><button id="run" class="action">Optimize & Download</button><div id="result" class="result"></div>`);
+ $("#run").onclick=async()=>{const f=$("#toolFile").files[0];if(!f)return toastMsg("Choose a PDF.");try{const src=await PDFLib.PDFDocument.load(await pdfBytes(f));const b=await src.save({useObjectStreams:true,addDefaultPage:false});downloadBlob(new Blob([b],{type:"application/pdf"}),"optimized-"+f.name);$("#result").textContent=`Original ${(f.size/1024).toFixed(1)} KB → Output ${(b.length/1024).toFixed(1)} KB`}catch(e){$("#result").textContent="Could not optimize this PDF."}};
+}
+
+function wordCounter(){setBody(`<textarea id="text" placeholder="Paste or type your text here..."></textarea><div class="stats-live"><div><b id="w">0</b><span>WORDS</span></div><div><b id="c">0</b><span>CHARACTERS</span></div><div><b id="l">0</b><span>LINES</span></div><div><b id="s">0</b><span>SENTENCES</span></div></div>`);$("#text").oninput=()=>{const t=$("#text").value;$("#w").textContent=(t.trim().match(/\S+/g)||[]).length;$("#c").textContent=t.length;$("#l").textContent=t? t.split(/\n/).length:0;$("#s").textContent=(t.match(/[.!?]+(?=\s|$)/g)||[]).length}}
+function caseConverter(){setBody(`<textarea id="text" placeholder="Type or paste text..."></textarea><div class="row"><button id="upper" class="action">UPPERCASE</button><button id="lower" class="action secondary">lowercase</button><button id="title" class="action secondary">Title Case</button><button id="sentence" class="action secondary">Sentence case</button></div>`);$("#upper").onclick=()=>$("#text").value=$("#text").value.toUpperCase();$("#lower").onclick=()=>$("#text").value=$("#text").value.toLowerCase();$("#title").onclick=()=>$("#text").value=$("#text").value.toLowerCase().replace(/\b\w/g,m=>m.toUpperCase());$("#sentence").onclick=()=>$("#text").value=$("#text").value.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g,m=>m.toUpperCase())}
+function jsonFormatter(){setBody(`<textarea id="text" placeholder='{"name":"Affan","tools":18}'></textarea><div class="row"><button id="format" class="action">Format</button><button id="mini" class="action secondary">Minify</button><button id="copy" class="action secondary">Copy</button></div><div id="result" class="result">Waiting for JSON...</div>`);$("#format").onclick=()=>jsonAct(2);$("#mini").onclick=()=>jsonAct(0);$("#copy").onclick=()=>navigator.clipboard.writeText($("#result").textContent).then(()=>toastMsg("Copied."));function jsonAct(sp){try{$("#result").textContent=JSON.stringify(JSON.parse($("#text").value),null,sp);$("#result").style.color="var(--accent)"}catch(e){$("#result").textContent="Invalid JSON: "+e.message;$("#result").style.color="#ff8f8f"}}}
+function base64Tool(){setBody(`<textarea id="text" placeholder="Text to encode or Base64 to decode..."></textarea><div class="row"><button id="enc" class="action">Encode</button><button id="dec" class="action secondary">Decode</button></div><div id="result" class="result"></div>`);$("#enc").onclick=()=>{try{$("#result").textContent=btoa(unescape(encodeURIComponent($("#text").value)))}catch(e){$("#result").textContent="Encoding failed."}};$("#dec").onclick=()=>{try{$("#result").textContent=decodeURIComponent(escape(atob($("#text").value.trim())))}catch(e){$("#result").textContent="Invalid Base64."}}}
+function urlTool(){setBody(`<textarea id="text" placeholder="https://example.com/?q=hello world"></textarea><div class="row"><button id="enc" class="action">Encode</button><button id="dec" class="action secondary">Decode</button></div><div id="result" class="result"></div>`);$("#enc").onclick=()=>$("#result").textContent=encodeURI($("#text").value);$("#dec").onclick=()=>{try{$("#result").textContent=decodeURI($("#text").value)}catch(e){$("#result").textContent="Invalid URL encoding."}}}
+function uuidTool(){setBody(`<div class="row"><label>How many?<input id="count" type="number" min="1" max="50" value="5"></label><button id="run" class="action">Generate UUIDs</button></div><div id="result" class="result"></div>`);$("#run").onclick=()=>{$("#result").textContent=Array.from({length:Math.min(50,Math.max(1,+$("#count").value||1))},()=>crypto.randomUUID()).join("\n")}}
+function passwordTool(){setBody(`<div class="row"><label>Length<input id="len" type="number" min="6" max="128" value="20"></label><label><input id="symbols" type="checkbox" checked> Include symbols</label><button id="run" class="action">Generate</button></div><div id="result" class="result"></div><button id="copy" class="action secondary">Copy password</button>`);$("#run").onclick=gen;$("#copy").onclick=()=>navigator.clipboard.writeText($("#result").textContent).then(()=>toastMsg("Password copied."));gen();function gen(){let chars="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";if($("#symbols").checked)chars+="!@#$%^&*()-_=+[]{}";const n=Math.min(128,Math.max(6,+$("#len").value||20));let out="";const a=new Uint32Array(n);crypto.getRandomValues(a);for(let i=0;i<n;i++)out+=chars[a[i]%chars.length];$("#result").textContent=out}}
+function qrTool(){setBody(`<input id="text" type="text" placeholder="Enter text or URL"><div class="row"><label>Size<select id="size"><option>180</option><option selected>240</option><option>320</option></select></label><button id="run" class="action">Generate QR</button></div><div id="qr" class="qr-wrap"></div><button id="download" class="action secondary">Download PNG</button>`);$("#run").onclick=()=>{const box=$("#qr");box.innerHTML="";new QRCode(box,{text:$("#text").value||"ALPHA_TOOLS",width:+$("#size").value,height:+$("#size").value,colorDark:"#000000",colorLight:"#ffffff"});};$("#download").onclick=()=>{const c=$("#qr canvas")||$("#qr img");if(!c)return toastMsg("Generate a QR first.");const a=document.createElement("a");a.href=c.tagName==="CANVAS"?c.toDataURL("image/png"):c.src;a.download="alpha-qr.png";a.click()};$("#run").click()}
+function timestampTool(){setBody(`<div class="row"><label>Date & Time<input id="date" type="datetime-local"></label><button id="toTs" class="action">→ Unix</button></div><div class="row"><label>Unix timestamp<input id="ts" type="text" placeholder="e.g. 1789750000"></label><button id="toDate" class="action secondary">→ Date</button></div><div id="result" class="result"></div>`);$("#date").value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);$("#toTs").onclick=()=>$("#result").textContent=Math.floor(new Date($("#date").value).getTime()/1000);$("#toDate").onclick=()=>{const d=new Date(Number($("#ts").value)*1000);$("#result").textContent=isNaN(d)?"Invalid timestamp":d.toString()}}
+function colorTool(){setBody(`<div class="row"><label>HEX<input id="hex" type="text" value="#B7FF3C"></label><button id="run" class="action">Convert</button></div><div id="result" class="result color-output"><span class="swatch"></span><span>RGB / HSL output</span></div>`);$("#run").onclick=()=>{let h=$("#hex").value.trim().replace("#","");if(h.length===3)h=h.split("").map(x=>x+x).join("");if(!/^[0-9a-fA-F]{6}$/.test(h))return toastMsg("Enter a valid HEX.");const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);const [hh,s,l]=rgbHsl(r,g,b);$("#result").innerHTML=`<span class="swatch" style="background:#${h}"></span><span>RGB(${r}, ${g}, ${b})<br>HSL(${hh}, ${s}%, ${l}%)</span>`};$("#run").click()}
+function rgbHsl(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min)h=s=0;else{const d=max-min;s=l>.5?d/(2-max-min):d/(max+min);switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4}h*=60}return[Math.round(h),Math.round(s*100),Math.round(l*100)]}
+function paletteTool(){setBody(`<div class="row"><label>Base HEX<input id="hex" type="text" value="#B7FF3C"></label><button id="run" class="action">Generate Palette</button></div><div id="palette" class="palette-grid"></div><div id="result" class="result">Five related colors will appear here.</div>`);$("#run").onclick=()=>{let h=$("#hex").value.trim().replace("#","");if(h.length===3)h=h.split("").map(x=>x+x).join("");if(!/^[0-9a-fA-F]{6}$/.test(h))return toastMsg("Enter a valid HEX.");const base=`#${h}`;const rgb=[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];const colors=[.75,.88,1,1.12,1.3].map(k=>"#"+rgb.map(v=>Math.max(0,Math.min(255,Math.round(v*k))).toString(16).padStart(2,"0")).join(""));$("#palette").innerHTML=colors.map(c=>`<div class="palette-chip" style="background:${c}">${c}</div>`).join("");$("#result").textContent=`Base: ${base}`};$("#run").click()}
+
+filterTools();
